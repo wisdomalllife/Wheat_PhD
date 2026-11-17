@@ -1,0 +1,22 @@
+GCF_018294505.1_IWGSC_CS_RefSeq_v2.1_genomic.fna.gz # genome
+datasets download genome accession GCF_018294505.1 --include genome
+
+# get chr only
+bioawk -c fastx '{if ($comment ~ /chromosome/) print ">"$name" "$comment"\n"$seq}' GCF_018294505.1_IWGSC_CS_RefSeq_v2.1_genomic.fna > GCF_018294505.1_IWGSC_CS_RefSeq_v2.1_chr.fna
+
+# get chr list
+grep ">" GCF_018294505.1_IWGSC_CS_RefSeq_v2.1_chr.fna > chr_list.txt 
+cut -d' ' -f1,7-8 chr_list.txt > chromosomes.txt
+sed -i 's/,//g' chromosomes.txt
+sed -i 's/>//g' chromosomes.txt
+
+or:
+
+grep ">" GCF_018294505.1_IWGSC_CS_RefSeq_v2.1_chr.fna | cut -d' ' -f1,7-8 | sed 's/[,>]//g' > chromosomes.txt
+
+# get chr lenght
+bioawk -c fastx '{print $name, length($seq) }' GCF_018294505.1_IWGSC_CS_RefSeq_v2.1_chr.fna > chrlen
+
+# annotation (automatic)
+wget https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/4565/GCF_018294505.1-RS_2025_04/GCF_018294505.1_IWGSC_CS_RefSeq_v2.1_genomic.gff.gz
+wget https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/4565/GCF_018294505.1-RS_2025_04/GCF_018294505.1_IWGSC_CS_RefSeq_v2.1_feature_table.txt.gz

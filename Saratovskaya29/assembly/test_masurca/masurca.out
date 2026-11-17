@@ -1,0 +1,31 @@
+Start time is 2026/11/05--14:51
+[Thu Nov  5 02:51:22 PM +07 2026] Processing pe library reads
+[Thu Nov  5 02:51:27 PM +07 2026] Average PE read length 132
+[Thu Nov  5 02:51:27 PM +07 2026] Using kmer size of 49 for the graph
+[Thu Nov  5 02:51:28 PM +07 2026] MIN_Q_CHAR: 33
+[Thu Nov  5 02:51:28 PM +07 2026] Creating mer database for Quorum
+[Thu Nov  5 02:51:42 PM +07 2026] Error correct PE
+[Thu Nov  5 02:52:53 PM +07 2026] Estimating genome size
+[Thu Nov  5 02:53:04 PM +07 2026] Estimated genome size: 8516601
+[Thu Nov  5 02:53:04 PM +07 2026] Creating k-unitigs with k=49
+[Thu Nov  5 02:54:31 PM +07 2026] Computing super reads from PE 
+[Thu Nov  5 02:54:48 PM +07 2026] Using linking mates
+[Thu Nov  5 02:54:48 PM +07 2026] Celera Assembler
+[Thu Nov  5 02:58:42 PM +07 2026] Overlap/unitig success
+[Thu Nov  5 02:58:42 PM +07 2026] Recomputing A-stat for super-reads
+[Thu Nov  5 02:58:46 PM +07 2026] Filtering overlaps
+[Thu Nov  5 03:01:36 PM +07 2026] Recomputing A-stat for super-reads
+[Thu Nov  5 03:01:59 PM +07 2026] CA success
+[Thu Nov  5 03:02:00 PM +07 2026] Gap closing
+[Thu Nov  5 03:04:01 PM +07 2026] Gap close success
+[Thu Nov  5 03:04:01 PM +07 2026] Removing redundant scaffolds
+[Thu Nov  5 03:04:09 PM +07 2026] Assembly complete, primary scaffold sequences are in CA/primary.genome.scf.fasta
+[Thu Nov  5 03:04:09 PM +07 2026] redundant or haplotype variant scaffold sequences are in CA/alternative.genome.scf.fasta
+[Thu Nov  5 03:04:09 PM +07 2026] All done, final assembly is in CA/primary.genome.scf.fasta
+[Thu Nov  5 03:04:09 PM +07 2026] Final stats for CA/primary.genome.scf.fasta
+N50 63229
+Sequence 6201205
+Average 4082.43
+E-size 80427.9
+Count 1519
+Finish time is 2026/11/05--15:04
