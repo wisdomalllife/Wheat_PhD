@@ -17,6 +17,66 @@ grep ">" GCF_018294505.1_IWGSC_CS_RefSeq_v2.1_chr.fna | cut -d' ' -f1,7-8 | sed 
 # get chr lenght
 bioawk -c fastx '{print $name, length($seq) }' GCF_018294505.1_IWGSC_CS_RefSeq_v2.1_chr.fna > chrlen
 
+#-----------------------------------------------------------
+
 # annotation (automatic)
-wget https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/4565/GCF_018294505.1-RS_2025_04/GCF_018294505.1_IWGSC_CS_RefSeq_v2.1_genomic.gff.gz
 wget https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/4565/GCF_018294505.1-RS_2025_04/GCF_018294505.1_IWGSC_CS_RefSeq_v2.1_feature_table.txt.gz
+grep -E "gene.*chromosome" GCF_018294505.1_IWGSC_CS_RefSeq_v2.1_feature_table.txt | wc -l
+# or
+awk -F'\t' '$1 == "gene" && /chromosome/' GCF_018294505.1_IWGSC_CS_RefSeq_v2.1_feature_table.txt | wc -l
+awk -F'\t' '$1 == "gene" && $5 == "chromosome"' GCF_018294505.1_IWGSC_CS_RefSeq_v2.1_feature_table.txt > Wheat_feature.txt
+grep -v "pseudo" Wheat_feature.txt | wc -l
+Feature table: 148,319 chromosomal gene rows = 129,987 non-pseudogene + 18,332 pseudogene rows
+
+wget https://ftp.ncbi.nlm.nih.gov/genomes/all/annotation_releases/4565/GCF_018294505.1-RS_2025_04/GCF_018294505.1_IWGSC_CS_RefSeq_v2.1_genomic.gff.gz
+
+awk 'BEGIN { OFS="t" } $3 == "gene" && $1 ~ /^NC_05/' GCF_018294505.1_IWGSC_CS_RefSeq_v2.1_genomic.gff > Wheat_genes.gff
+GFF: 130,054 gene features on the 21 chromosomes
+cut -f1 Wheat_genes.gff | uniq | head -21
+
+# getting bed file with genes
+awk 'BEGIN {FS=OFS="\t"} $3 == "gene" && $1 ~ /^NC_05/ {
+    if (match($9, /gene=[^;]+/)) # Match gene= ;any character except a (;); one or more occurrences of the preceding expression.(checking whether match() successfully finds it)
+       print $1, $4-1, $5, substr($9, RSTART+5, RLENGTH-5) # RSTART+5 skips the prefix, RLENGTH-5 extracts the remaining characters
+}' GCF_018294505.1_IWGSC_CS_RefSeq_v2.1_genomic.gff | sort -k1,1 -k2,2n > genes.bed #sorts a text file based on column 1 first, then column 2 numerically.
+# ------------------------------------------------------------
+# Identify gene clusters (less than 1 Mb apart). genes can be inside each other
+
+awk 'BEGIN {FS=OFS="\t"}
+# NR == 1 means that this block runs only for the first line of the input file.
+# next tells AWK to skip the remaining commands for this line and immediately read the next line.
+NR == 1 {chr = $1; cluster_start = $2; cluster_end = $3; count = 1; genes = $4; prev_end = $3; next}
+{
+    distance = $2 - prev_end
+
+    if ($1 == chr && distance < 1000000) {
+        count++ # Increases the number of genes in the cluster by one
+        genes = genes "," $4 # Adds the current gene ID to the list of genes in the cluster.
+        if ($3 > cluster_end)
+            cluster_end = $3
+    }
+    # Start a new cluster when the distance is too large or new chr
+    else {
+        print chr, cluster_start, cluster_end, count, genes
+        chr = $1; cluster_start = $2; cluster_end = $3; count = 1; genes = $4
+    }
+    # update the end coordinate of the previous gene
+    prev_end = $3
+}
+# Print the last cluster; end executes after AWK has finished reading the entire file.
+END {
+    if (NR > 0) # ensures that the command only prints a cluster if the input file contains at least one record
+        print chr, cluster_start, cluster_end, count, genes
+}' genes.bed > gene_clusters.bed
+
+
+
+
+# 1 Mb windows across the genome (genome.txt = chromosome name + length):
+bedtools makewindows -g genome.txt -w 1000000 > windows.bed
+
+# genes per window:
+bedtools intersect -a windows.bed -b genes.bed -c > gene_density.bed
+
+mosdepth genes_cov Wheat_L1.sorted.bam --by genes.bed -Q 20 -F 0x704
+# → genes_cov.regions.bed.gz: one row per gene with mean coverage

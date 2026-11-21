@@ -36,3 +36,5 @@ samtools merge -@ 10 -o $OUTPUT/Wheat.${Lib}.merged.sorted.bam  $OUTPUT/Wheat.${
 samtools index -c -@ 10 $OUTPUT/Wheat.${Lib}.merged.sorted.bam
 rm $OUTPUT/Wheat.${Lib}.part_*.sorted.bam
 echo Finish time is `date +%Y/%m/%d--%H:%M`
+samtools stats -@ 10 $OUTPUT/Wheat.${Lib}.merged.sorted.bam > samstats.${Lib}.txt
+# bamtools stats -in $OUTPUT/Wheat.${Lib}.merged.sorted.bam

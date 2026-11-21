@@ -13,6 +13,7 @@ Dorado=./Dorado/dorado-0.9.6-linux-x64/bin
 DATA=./nanopore_data
 OUTPUT=./nanopore_basecalled
 
+# ls head -n -1 > flow_list.txt or sed -i '$d' flow_list.txt
 FLOW_LIST=${DATA}/flow_list.txt # list of names
 
 # convert to pod5
